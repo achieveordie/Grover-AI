@@ -1,19 +1,15 @@
 from pprint import pprint
+import math
+import time
+import tkinter
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (NavigationToolbar2Tk, FigureCanvasTkAgg)
+from matplotlib.backend_bases import key_press_handler
 
-from qiskit import IBMQ, Aer, QuantumCircuit, ClassicalRegister, QuantumRegister, execute
-import qiskit
+from qiskit import Aer, QuantumCircuit, execute
+from qiskit.visualization import circuit_drawer
+
 from Oracles import single_solution
-
-n = 3
-# grover_circuit = QuantumCircuit(n)
-# grover_circuit = initialize_s(grover_circuit, [0, 1, 2])
-# grover_circuit.append(oracle_ex3, [0, 1, 2])
-# grover_circuit.append(diffuser(n), [0, 1, 2])
-# grover_circuit.measure_all()
-#
-# backend = Aer.get_backend('qasm_simulator')
-# counts = execute(grover_circuit, backend=backend, shots=1024).result().get_counts()
-# pprint(counts, indent=4)
 
 
 class Grover:
@@ -22,7 +18,7 @@ class Grover:
         self.oracle = oracle
         self.backend = backend
         self.shots = shots
-        self._circuit = qiskit.QuantumCircuit(self.n_qubits)
+        self._circuit = QuantumCircuit(self.n_qubits)
 
     def getOracle(self):
         self._circuit.append(self.oracle, [i for i in range(self.n_qubits)])
@@ -51,7 +47,63 @@ class Grover:
         return execute(self._circuit, self.backend, shots=self.shots).result().get_counts()
 
     def drawCircuit(self):
-        pass
+        def onKeyPress(event):
+            key_press_handler(event, canvas, toolbar)
+
+        def quitScreen():
+            root.quit()
+            root.destroy()
+
+        root = tkinter.Tk()
+        root.title(f"Grover Solver with oracle:{self.oracle.name}")
+        root.geometry("500x500")
+
+        fig = Figure(figsize=(5, 10), dpi=90)
+        axes = fig.add_subplot(5, 10, 1)
+        circuit_drawer(circuit=self._circuit, output='mpl', ax=axes)
+
+        # fig2 = circuit_drawer(circuit=self._circuit, output='mpl')
+
+        canvas = FigureCanvasTkAgg(fig, master=root)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+
+        toolbar = NavigationToolbar2Tk(canvas, root)
+        toolbar.update()
+        canvas.get_tk_widget().pack()
+
+        canvas.mpl_connect("on_key_press", onKeyPress)
+
+        time.sleep(100)
+
+        # quit_button = tkinter.Button(master=root, text="Quit", command=quitScreen())
+        # quit_button.pack(side=tkinter.BOTTOM)
+
+        root.mainloop()
 
     def plotResults(self):
         pass
+
+
+def solve(search_number):
+    oracle = None
+    if search_number == 0:
+        oracle = single_solution.Oracle0().getOracle()
+    elif search_number == 1:
+        oracle = single_solution.Oracle1().getOracle()
+
+    g_circuit = Grover(nqubits=3, oracle=oracle)
+    g_circuit.prepareState()
+    g_circuit.getOracle()
+    g_circuit.getAmplifier()
+
+    for i in range(int(math.sqrt(search_number))):
+        g_circuit.getOracle()
+        g_circuit.getAmplifier()
+
+    g_circuit.drawCircuit()
+    pprint(g_circuit.measureResults())
+
+
+if __name__ == '__main__':
+    solve(0)

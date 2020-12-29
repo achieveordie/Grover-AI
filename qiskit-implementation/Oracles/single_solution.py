@@ -41,7 +41,7 @@ class Oracle1(ThreeQubitsOracles):
         for qubit in range(self.n_qubits-1):
             self.oracle.x(qubit)
         self.oracle.h(self.n_qubits-1)
-        self.oracle.ccx([i for i in range(self.n_qubits-1)], self.n_qubits-1)
+        self.oracle.ccx(0, 1, self.n_qubits-1)
         self.oracle.h(self.n_qubits-1)
         for qubit in range(self.n_qubits-1):
             self.oracle.x(qubit)
