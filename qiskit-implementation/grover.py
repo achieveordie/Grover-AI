@@ -1,13 +1,10 @@
-from pprint import pprint
 import math
-import time
 import tkinter
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (NavigationToolbar2Tk, FigureCanvasTkAgg)
-from matplotlib.backend_bases import key_press_handler
 
 from qiskit import Aer, QuantumCircuit, execute
-from qiskit.visualization import circuit_drawer
+from qiskit.visualization import circuit_drawer, plot_histogram
 
 from Oracles import single_solution
 
@@ -47,42 +44,38 @@ class Grover:
         return execute(self._circuit, self.backend, shots=self.shots).result().get_counts()
 
     def drawCircuit(self):
-        def onKeyPress(event):
-            key_press_handler(event, canvas, toolbar)
-
-        def quitScreen():
-            root.quit()
-            root.destroy()
-
         root = tkinter.Tk()
         root.title(f"Grover Solver with oracle:{self.oracle.name}")
         root.geometry("500x500")
 
-        fig = Figure(figsize=(5, 10), dpi=90)
-        axes = fig.add_subplot(5, 10, 1)
+        fig = Figure(figsize=(5, 5), dpi=90)
+        axes = fig.add_subplot(111)
         circuit_drawer(circuit=self._circuit, output='mpl', ax=axes)
-
-        # fig2 = circuit_drawer(circuit=self._circuit, output='mpl')
 
         canvas = FigureCanvasTkAgg(fig, master=root)
         canvas.draw()
-        canvas.get_tk_widget().pack()
+        canvas.get_tk_widget().pack(expand=1)
 
         toolbar = NavigationToolbar2Tk(canvas, root)
         toolbar.update()
-        canvas.get_tk_widget().pack()
-
-        canvas.mpl_connect("on_key_press", onKeyPress)
-
-        time.sleep(100)
-
-        # quit_button = tkinter.Button(master=root, text="Quit", command=quitScreen())
-        # quit_button.pack(side=tkinter.BOTTOM)
 
         root.mainloop()
 
-    def plotResults(self):
-        pass
+
+def plotResults(count_dict):
+    root = tkinter.Tk()
+    root.title("Plotting the results of measurement.")
+    root.geometry("500x500")
+    fig = Figure(figsize=(5, 5), dpi=90)
+    axes = fig.add_subplot(111)
+
+    plot_histogram(data=count_dict, sort='desc', bar_labels=True, ax=axes)
+
+    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas.draw()
+    canvas.get_tk_widget().pack(expand=1)
+
+    root.mainloop()
 
 
 def solve(search_number):
@@ -102,7 +95,7 @@ def solve(search_number):
         g_circuit.getAmplifier()
 
     g_circuit.drawCircuit()
-    pprint(g_circuit.measureResults())
+    plotResults(g_circuit.measureResults())
 
 
 if __name__ == '__main__':
