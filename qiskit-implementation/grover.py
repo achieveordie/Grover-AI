@@ -17,6 +17,7 @@ class Grover:
     `backend`: the backend to be used for measurement. Defaults to qasm_simulator.
     `shots`:<int> number of shots of the measurements that is to be performed. Defaults to 1024.
     """
+
     def __init__(self, nqubits, oracle, backend=Aer.get_backend('qasm_simulator'), shots=1024):
         self.n_qubits = nqubits
         self.oracle = oracle
@@ -34,9 +35,9 @@ class Grover:
         for qubit in range(self.n_qubits):
             qc.h(qubit)
             qc.x(qubit)
-        qc.h(self.n_qubits-1)
-        qc.mct(list(range(self.n_qubits-1)), self.n_qubits-1)
-        qc.h(self.n_qubits-1)
+        qc.h(self.n_qubits - 1)
+        qc.mct(list(range(self.n_qubits - 1)), self.n_qubits - 1)
+        qc.h(self.n_qubits - 1)
         for qubit in range(self.n_qubits):
             qc.x(qubit)
             qc.h(qubit)
@@ -82,21 +83,28 @@ class Grover:
 def plotResults(count_dict):
     """
     This takes a dictionary of counts and plots a histogram to show the distribution.
+    The keys received are in little-endian format and so need to convert it into integer.
     :param count_dict: <dict> with {key:value} pair as {number: number of times it showed as a measurement}
     :return: None, displays a pop up putting the program to a halt till it closes.
     """
+    count_dict = dict(zip([sum([pow(2, i) * int(k) for i, k in enumerate(key)]) for key in count_dict.keys()],
+                          list(count_dict.values())))
     root = tkinter.Tk()
     root.title("Plotting the results of measurement.")
     root.geometry("500x500")
     fig = Figure(figsize=(5, 5), dpi=90)
     axes = fig.add_subplot(111)
 
-    plot_histogram(data=count_dict, sort='desc', bar_labels=True, ax=axes)
+    plot_histogram(data=count_dict, sort='desc', bar_labels=True, ax=axes, color='#FFB000')
 
     canvas = FigureCanvasTkAgg(fig, master=root)
     canvas.draw()
     canvas.get_tk_widget().pack(expand=1)
 
+    frame = tkinter.Frame(root)
+    frame.pack()
+    close_button = tkinter.Button(frame, text="close", command=root.quit)
+    close_button.pack(side=tkinter.BOTTOM)
     root.mainloop()
 
 
@@ -107,12 +115,13 @@ def solve(search_number):
     :return: None.
     """
     oracle = None
+    n_qubits = 3
     if search_number == 0:
         oracle = single_solution.Oracle0().getOracle()
     elif search_number == 1:
         oracle = single_solution.Oracle1().getOracle()
 
-    g_circuit = Grover(nqubits=3, oracle=oracle)
+    g_circuit = Grover(nqubits=n_qubits, oracle=oracle)
     g_circuit.prepareState()
     g_circuit.getOracle()
     g_circuit.getAmplifier()
@@ -121,9 +130,9 @@ def solve(search_number):
         g_circuit.getOracle()
         g_circuit.getAmplifier()
 
-    g_circuit.drawCircuit()
+    # g_circuit.drawCircuit()
     plotResults(g_circuit.measureResults())
 
 
 if __name__ == '__main__':
-    solve(0)
+    solve(1)
