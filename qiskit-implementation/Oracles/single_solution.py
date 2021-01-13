@@ -21,12 +21,10 @@ class Oracle0(ThreeQubitsOracles):
     def getOracle(self):
         for qubit in range(self.n_qubits):
             self.oracle.x(qubit)
-        self.oracle.barrier()
 
         self.oracle.h(self.n_qubits-1)
         self.oracle.ccx(0, 1, target_qubit=self.n_qubits-1)
         self.oracle.h(self.n_qubits-1)
-        self.oracle.barrier()
 
         for qubit in range(self.n_qubits):
             self.oracle.x(qubit)
@@ -44,12 +42,10 @@ class Oracle1(ThreeQubitsOracles):
     def getOracle(self):
         for qubit in range(self.n_qubits-1):
             self.oracle.x(qubit)
-        self.oracle.barrier()
 
         self.oracle.h(self.n_qubits-1)
         self.oracle.ccx(0, 1, self.n_qubits-1)
         self.oracle.h(self.n_qubits-1)
-        self.oracle.barrier()
 
         for qubit in range(self.n_qubits-1):
             self.oracle.x(qubit)
@@ -67,12 +63,10 @@ class Oracle2(ThreeQubitsOracles):
     def getOracle(self):
         self.oracle.x(0)
         self.oracle.x(self.n_qubits-1)
-        self.oracle.barrier()
 
         self.oracle.h(self.n_qubits-1)
         self.oracle.ccx(control_qubit1=0, control_qubit2=1, target_qubit=self.n_qubits-1)
         self.oracle.h(self.n_qubits-1)
-        self.oracle.barrier()
 
         self.oracle.x(0)
         self.oracle.x(self.n_qubits - 1)
@@ -89,12 +83,10 @@ class Oracle3(ThreeQubitsOracles):
 
     def getOracle(self):
         self.oracle.x(0)
-        self.oracle.barrier()
 
         self.oracle.h(self.n_qubits-1)
         self.oracle.ccx(control_qubit1=0, control_qubit2=1, target_qubit=2)
         self.oracle.h(self.n_qubits-1)
-        self.oracle.barrier()
 
         self.oracle.x(0)
 
@@ -111,12 +103,10 @@ class Oracle4(ThreeQubitsOracles):
     def getOracle(self):
         for i in range(1, self.n_qubits):
             self.oracle.x(i)
-        self.oracle.barrier()
 
         self.oracle.h(self.n_qubits-1)
         self.oracle.ccx(control_qubit1=0, control_qubit2=1, target_qubit=self.n_qubits-1)
         self.oracle.h(self.n_qubits-1)
-        self.oracle.barrier()
 
         for i in range(1, self.n_qubits):
             self.oracle.x(i)
@@ -133,12 +123,10 @@ class Oracle5(ThreeQubitsOracles):
 
     def getOracle(self):
         self.oracle.x(1)
-        self.oracle.barrier()
 
         self.oracle.h(self.n_qubits-1)
         self.oracle.ccx(control_qubit1=0, control_qubit2=1, target_qubit=self.n_qubits-1)
         self.oracle.h(self.n_qubits-1)
-        self.oracle.barrier()
 
         self.oracle.x(1)
 
@@ -154,12 +142,10 @@ class Oracle6(ThreeQubitsOracles):
 
     def getOracle(self):
         self.oracle.x(self.n_qubits-1)
-        self.oracle.barrier()
 
         self.oracle.h(self.n_qubits-1)
         self.oracle.ccx(control_qubit1=0, control_qubit2=1, target_qubit=self.n_qubits-1)
         self.oracle.h(self.n_qubits-1)
-        self.oracle.barrier()
 
         self.oracle.x(self.n_qubits-1)
 
