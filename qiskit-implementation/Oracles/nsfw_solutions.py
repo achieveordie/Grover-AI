@@ -8,11 +8,12 @@ from qiskit.circuit.library import Diagonal
 
 class OracleNSFW:
     def __init__(self, search):
-        self.n_qubits = 1
+        self.n_qubits = 3
         if type(search) == int:
             self.search_int = search
-            while 2**self.n_qubits < search:
-                self.n_qubits += 1
+            if search >= 8:
+                while 2**self.n_qubits < search:
+                    self.n_qubits += 1
         elif type(search) in (list, tuple):
             self.search_int = tuple(search)
             max_int = max(self.search_int)
@@ -22,7 +23,7 @@ class OracleNSFW:
 
     def getOracle(self):
         if type(self.search_int) == int:
-            self.elements[self.search_int-1] = -1
+            self.elements[self.search_int] = -1
             oracle_gate = Diagonal(self.elements)
             oracle_gate.name = f"O({self.n_qubits}-{self.search_int})"
             return oracle_gate
